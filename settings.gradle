@@ -1,0 +1,3 @@
+rootProject.name = 'spinnaker-credentials-plugin'
+include 'remote-credentials'
+
