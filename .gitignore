@@ -1,0 +1,15 @@
+# IDE
+.idea
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+
+# build
+.gradle
+build
+*/bin/
+build/
+build-gen/

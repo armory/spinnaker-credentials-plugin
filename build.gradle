@@ -1,0 +1,52 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'https://dl.bintray.com/spinnaker/gradle/' }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+}
+
+plugins {
+    id("io.spinnaker.plugin.bundler").version("$spinnakerGradleVersion")
+}
+
+apply plugin: "io.spinnaker.plugin.bundler"
+
+version = normalizedVersion()
+
+spinnakerBundle {
+    pluginId = "Armory.RemoteCredentials"
+    description = "Remote credentials with Spinnaker"
+    provider = "https://armory.io"
+    version = rootProject.version
+}
+
+subprojects { project ->
+    version = rootProject.version
+    apply plugin: 'java-library'
+
+    repositories {
+        jcenter()
+        maven { url = uri("https://spinnaker-releases.bintray.com/jars") }
+    }
+
+    dependencies {
+        implementation platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+        annotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+        testAnnotationProcessor platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+    }
+}
+
+task version() {
+    println(version)
+}
+
+String normalizedVersion() {
+    new ByteArrayOutputStream().withStream { os ->
+        exec {
+            executable = "$projectDir/build-tools/version.sh"
+            standardOutput = os
+        }
+        ext.version = os.toString().trim()
+    }
+}

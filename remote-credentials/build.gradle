@@ -1,0 +1,43 @@
+apply plugin: "io.spinnaker.plugin.service-extension"
+
+spinnakerPlugin {
+    serviceName = "clouddriver"
+    pluginClass = "io.armory.plugin.credentials.RemoteCredentialsPlugin"
+}
+
+sourceSets.main.java.srcDirs = ['src/main/java']
+
+group = "io.armory.plugin.credentials"
+
+dependencies {
+    platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
+    compileOnly "com.netflix.spinnaker.clouddriver:clouddriver-kubernetes:$clouddriverVersion"
+    compileOnly "com.netflix.spinnaker.clouddriver:clouddriver-cloudfoundry:$clouddriverVersion"
+    compileOnly "com.netflix.spinnaker.kork:kork-plugins-spring-api:$korkVersion"
+    compileOnly "com.netflix.spinnaker.kork:kork-credentials-api:$korkVersion"
+    compileOnly "com.netflix.spinnaker.kork:kork-secrets:$korkVersion"
+    compileOnly "org.yaml:snakeyaml"
+
+
+    compileOnly "org.projectlombok:lombok"
+    annotationProcessor "org.projectlombok:lombok"
+    testAnnotationProcessor "org.projectlombok:lombok"
+
+
+    compileOnly(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}") {
+        exclude group: "org.slf4j"
+    }
+    annotationProcessor(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")
+
+    testImplementation "cglib:cglib-nodep"
+    testImplementation "org.objenesis:objenesis"
+    testImplementation "org.assertj:assertj-core"
+    testImplementation "org.mockito:mockito-core"
+    testImplementation "org.junit.jupiter:junit-jupiter-api"
+    testImplementation "org.junit.jupiter:junit-jupiter-params"
+    testImplementation "org.junit.platform:junit-platform-runner"
+
+    testImplementation "com.netflix.spinnaker.clouddriver:clouddriver-kubernetes:$clouddriverVersion"
+    testImplementation "com.netflix.spinnaker.clouddriver:clouddriver-cloudfoundry:$clouddriverVersion"
+    testImplementation "com.fasterxml.jackson.core:jackson-databind"
+}

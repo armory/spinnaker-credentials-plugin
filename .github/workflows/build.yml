@@ -1,0 +1,107 @@
+name: Build Spinnaker Credentials Plugin
+on:
+  push:
+    branches:
+      - master
+      - release-*
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set Java version
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+          java-package: jdk
+          architecture: x64
+
+      - name: Get all tags
+        run: git fetch --prune --tags --unshallow
+
+      - name: Determine build type
+        id: build_type
+        run: |
+          echo "github.ref: ${{ github.ref }}"
+          echo "github.base_ref: ${{ github.base_ref }}"
+          echo "github.head_ref: ${{ github.head_ref }}"
+          echo "branch: $(git rev-parse --abbrev-ref HEAD)"
+
+          if [[ ${{github.event_name }} = "pull_request" ]] ; then branch_override=${{ github.head_ref }} ; fi
+
+          # On PRs to release branches, build RC releases for target release branch
+          if [[ ${{github.event_name }} = "pull_request" && "x${{ github.base_ref }}" =~ ^xrelease-* ]]
+          then
+            echo "Building release candidate"
+            build_type=rc
+            branch_override=${{ github.base_ref }}
+
+          # On any build running on master branch, build RC versions
+          elif [[ ${{ github.ref }} = "refs/heads/master" ]]
+          then
+            echo "Building release candidate"
+            build_type=rc
+
+          # On any build running on release branches, build final release
+          elif [[ ${{ github.ref }} =~ ^refs/heads/release-* ]]
+          then
+            echo "Building final release"
+            build_type=release
+
+          else
+            echo "Building snapshot"
+            build_type=snapshot
+          fi
+
+          version=$(VERSION_TYPE=$build_type BRANCH_OVERRIDE=$branch_override ./gradlew -q version)
+          echo "Version: $version"
+
+          # Make sure the version can be used as a tag
+          git tag v$version
+          git tag -d v$version
+
+          echo "##[set-output name=build_type;]$build_type"
+          echo "##[set-output name=version;]$version"
+          echo "##[set-output name=branch_override;]$branch_override"
+
+      - name: Build
+        run: |
+          VERSION_TYPE=${{ steps.build_type.outputs.build_type }} BRANCH_OVERRIDE=${{ steps.build_type.outputs.branch_override }} ./gradlew releaseBundle -x test
+
+      - name: Unit tests
+        run: |
+          ./gradlew test
+
+      - name: Push git tag
+        if: steps.build_type.outputs.build_type == 'rc' || steps.build_type.outputs.build_type == 'release'
+        run: |
+          git tag v${{ steps.build_type.outputs.version }}
+          git push origin v${{ steps.build_type.outputs.version }}
+
+      - name: Create Release
+        if: steps.build_type.outputs.build_type == 'release'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.build_type.outputs.version }}
+          release_name: v${{ steps.build_type.outputs.version }}
+          draft: false
+          prerelease: false
+
+      - name: Upload plugins
+        id: upload-release-asset
+        if: steps.build_type.outputs.build_type == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/distributions/spinnaker-credentials-plugin-${version}.zip
+          asset_name: remote-credentials-${version}.zip
+          asset_content_type: application/zip
