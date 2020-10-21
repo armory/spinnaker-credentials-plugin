@@ -1,6 +1,6 @@
 [
   {
-    "id": "examplePluginsRepo",
+    "id": "spinnaker-credentials-plugin",
     "url": "https://raw.githubusercontent.com/armory/spinnaker-credentials-plugin/master/plugins.json"
   }
 ]

@@ -40,11 +40,11 @@ jobs:
             build_type=rc
             branch_override=${{ github.base_ref }}
 
-          # On any build running on master branch, build RC versions
+          # On any build running on master branch build new patch
           elif [[ ${{ github.ref }} = "refs/heads/master" ]]
           then
             echo "Building release candidate"
-            build_type=rc
+            build_type=release
 
           # On any build running on release branches, build final release
           elif [[ ${{ github.ref }} =~ ^refs/heads/release-* ]]
@@ -105,3 +105,13 @@ jobs:
           asset_path: build/distributions/spinnaker-credentials-plugin-${version}.zip
           asset_name: remote-credentials-${version}.zip
           asset_content_type: application/zip
+
+      - name: add release to plugin repo
+        id: add-release
+        uses: armory-io/plugin-metadata-updater@master
+        env:
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          metadata: build/distributions/plugin-info.json
+          binary_url: https://github.com/${{ steps.get_project_info.outputs.REPO }}/releases/download/${{ steps.get_project_info.outputs.VERSION }}/${{ steps.get_project_info.outputs.PROJECT }}-${{ steps.get_project_info.outputs.VERSION }}.zip
+          metadata_repo_url: https://github.com/armory/spinnaker-credentials-plugin

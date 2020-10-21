@@ -39,5 +39,7 @@ dependencies {
 
     testImplementation "com.netflix.spinnaker.clouddriver:clouddriver-kubernetes:$clouddriverVersion"
     testImplementation "com.netflix.spinnaker.clouddriver:clouddriver-cloudfoundry:$clouddriverVersion"
+    testImplementation "com.netflix.spinnaker.kork:kork-credentials-api:$korkVersion"
+    testImplementation "com.netflix.spinnaker.kork:kork-secrets:$korkVersion"
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
 }

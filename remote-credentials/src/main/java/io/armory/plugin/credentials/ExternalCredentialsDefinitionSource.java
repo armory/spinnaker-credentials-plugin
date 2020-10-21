@@ -47,7 +47,7 @@ public abstract class ExternalCredentialsDefinitionSource<T extends CredentialsD
   protected final RemoteCredentialsProperties remoteCredentialsProperties;
   private final SecretManager secretManager;
   private ObjectMapper mapper;
-  private URL url;
+  private final URL url;
   private final Yaml yaml = new Yaml(new SafeConstructor());
 
   public ExternalCredentialsDefinitionSource(
@@ -81,10 +81,20 @@ public abstract class ExternalCredentialsDefinitionSource<T extends CredentialsD
     return new BufferedReader(new InputStreamReader(url.openStream(), Charset.defaultCharset()));
   }
 
+  protected List<T> readFormat(Reader reader) throws IOException {
+      switch (remoteCredentialsProperties.getFormat()) {
+        case YAML:
+          return mapper.convertValue(yaml.load(reader), getType());
+        case JSON:
+          return mapper.readValue(reader, getType());
+      }
+      throw new UnsupportedOperationException("Unknown format " + remoteCredentialsProperties.getFormat());
+  }
+
   @Override
   public @NotNull List<T> getCredentialsDefinitions() {
     try (Reader reader = getDefinitionReader()) {
-      return mapper.convertValue(yaml.load(reader), getType());
+      return readFormat(reader);
     } catch (IOException e) {
       throw new IllegalArgumentException("Unable to read credential information", e);
     }
