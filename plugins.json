@@ -1,2 +1,17 @@
 [
+  {
+    "id": "Armory.RemoteCredentials",
+    "description": "Enables Spinnaker to retrieve credentials from a remote endpoint",
+    "provider": "https://armory.io",
+    "releases": [
+      {
+        "version": "0.2.0",
+        "date": "2020-10-20T19:23:00.200Z",
+        "requires": "clouddriver>=0.0.0",
+        "sha512sum": "49a215cd1097d54b09594aeb46f8539d63ed007b12a14c49d4486b3b99dc02c3412230e75009eb90e78dfc97577f4c487d4c7f837d683b5bd6bfd3c4af50af7d",
+        "state": "",
+        "url": "https://github.com/armory/spinnaker-credentials-plugin/releases/download/v0.2.0/remote-credentials-0.2.0.zip"
+      }
+    ]
+  }
 ]
