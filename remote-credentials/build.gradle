@@ -13,6 +13,8 @@ dependencies {
     platform("com.netflix.spinnaker.kork:kork-bom:$korkVersion")
     compileOnly "com.netflix.spinnaker.clouddriver:clouddriver-kubernetes:$clouddriverVersion"
     compileOnly "com.netflix.spinnaker.clouddriver:clouddriver-cloudfoundry:$clouddriverVersion"
+    compileOnly "com.netflix.spinnaker.clouddriver:clouddriver-security:$clouddriverVersion"
+    compileOnly "com.netflix.spinnaker.clouddriver:clouddriver-api:$clouddriverVersion"
     compileOnly "com.netflix.spinnaker.kork:kork-plugins-spring-api:$korkVersion"
     compileOnly "com.netflix.spinnaker.kork:kork-credentials-api:$korkVersion"
     compileOnly "com.netflix.spinnaker.kork:kork-secrets:$korkVersion"
