@@ -54,7 +54,8 @@ credentials:
   remote:
     [provider]: # kubernetes, cloudfoundry
       enabled: true
-      endpoint: URI to the endpoint
+      endpoint: [URI to the endpoint]
+      format: [format] # YAML (default), JSON
 ```
 
 If you want to reload the credentials on a regular basis, you can use `credentials.poller`:
@@ -69,6 +70,11 @@ credentials:
 ```
 
 As of 1.23, provider can be one of `kubernetes` and `cloudfoundry`. More providers are coming!
+
+## Loading Kubernetes account in parallel
+If `credentials.loader.kubernetes.parallel: true` the default credentials loader will be changed to add accounts
+in a parallel stream. There are tradeoffs to using parallel streams in the JVM so read it first. We expect boot time
+improvements when adding many accounts.
 
 ## Extending this plugin
 
